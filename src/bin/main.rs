@@ -10,7 +10,6 @@ pub fn main() {
     let width = 1920;
     let height = 1080;
 
-
     unsafe {
         assert_eq!(SDL_Init(SDL_INIT_EVERYTHING), 0);
  
@@ -28,7 +27,6 @@ pub fn main() {
         let renderer = SDL_CreateRenderer(window, -1, 1);
         // Panic if renderer is not null
         assert!(!renderer.is_null());
-        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
 
         let mut event = SDL_Event::default();
         loop {
@@ -40,7 +38,8 @@ pub fn main() {
               }
               _ => (),
             }//match
-            // SDL_RenderClear(renderer);
+            SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+            SDL_RenderClear(renderer);
 
             render(renderer, width as u32, height as u32);
 
