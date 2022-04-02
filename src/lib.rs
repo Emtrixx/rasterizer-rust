@@ -5,12 +5,15 @@ use fermium::{
 };
 use glam::UVec2;
 
-pub fn render(renderer: *mut SDL_Renderer, width: u32, height: u32) {
-    draw_wireframe_triangle(UVec2::new(800, 10), UVec2::new(1900, 970),UVec2::new(10, 1070) , renderer);
-    fill_triangle(UVec2::new(800, 10), UVec2::new(1900, 970),UVec2::new(10, 1070) , renderer);
+pub fn render(renderer: *mut SDL_Renderer, width: u32, height: u32, mut counter: u32) {
+    let p0 = UVec2::new(800, (10 + counter) % height);
+    let p1 = UVec2::new(1900, (970) + counter) % height;
+    let p2 = UVec2::new(10, (1070 + counter) % height);
+    draw_wireframe_triangle(p0, p1, p2, renderer);
+    draw_filled_triangle(p0, p1, p2, renderer);
 }
 
-fn draw_wireframe_triangle(mut p0: UVec2,mut p1: UVec2, mut p2: UVec2, renderer: *mut SDL_Renderer) {
+fn draw_wireframe_triangle(p0: UVec2,p1: UVec2, p2: UVec2, renderer: *mut SDL_Renderer) {
     draw_line(p0, p1, renderer);
     draw_line(p1, p2, renderer);
     draw_line(p2, p0, renderer);
@@ -57,7 +60,7 @@ fn interpolate(i0: u32, d0: f32, i1: u32, d1: f32)-> Vec<f32> {
     values
 }
 
-fn fill_triangle(mut p0: UVec2,mut p1: UVec2, mut p2: UVec2, renderer: *mut SDL_Renderer) {
+fn draw_filled_triangle(mut p0: UVec2,mut p1: UVec2, mut p2: UVec2, renderer: *mut SDL_Renderer) {
     if p0.y > p1.y {
         (p0, p1) = (p1, p0);
     }
@@ -76,17 +79,24 @@ fn fill_triangle(mut p0: UVec2,mut p1: UVec2, mut p2: UVec2, renderer: *mut SDL_
     x01.append(&mut x12);
     let x012 = x01.clone();
 
-    if p0.x > p2.x {
-        (p0, p2) = (p2, p0);
+    let m = (x02.len() / 2) as  usize;
+    let left: Vec<f32>;
+    let right: Vec<f32>;
+
+    if x02[m] < x012[m] {
+        left = x02.clone();
+        right = x012.clone();
+    } else {
+        left = x012.clone();
+        right = x02.clone();
     }
-    let ys = interpolate(p0.x,p0.y as f32, p2.x, p2.y as f32);
-    if x02[(x02.len() / 2) as  usize] < x012[((x012.len() / 2) as usize)] {
-        for (i, left) in x02.iter().enumerate() {
-            for x in (*left as u32)..(x012[i] as u32) {
-                unsafe {
-                    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-                    SDL_RenderDrawPoint(renderer, x as i32, ys[(i as usize) % 790] as i32);
-                }
+
+    for y in p0.y..p2.y {
+        let p = (y-(p0.y)) as usize;
+        for x in left[p] as u32..right[p] as u32 {
+            unsafe {
+                SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+                SDL_RenderDrawPoint(renderer, x as i32, y as i32);
             }
         }
     }

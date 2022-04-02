@@ -9,6 +9,7 @@ use glam::UVec2;
 pub fn main() {
     let width = 1920;
     let height = 1080;
+    let mut counter = 0;
 
     unsafe {
         assert_eq!(SDL_Init(SDL_INIT_EVERYTHING), 0);
@@ -30,6 +31,7 @@ pub fn main() {
 
         let mut event = SDL_Event::default();
         loop {
+            counter = (counter + 1) % 10000;
             assert_eq!(SDL_WaitEvent(&mut event), 1);
             match event.type_ {
               SDL_QUIT => {
@@ -41,7 +43,7 @@ pub fn main() {
             SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
             SDL_RenderClear(renderer);
 
-            render(renderer, width as u32, height as u32);
+            render(renderer, width as u32, height as u32, counter);
 
             SDL_RenderPresent(renderer);
 
