@@ -7,8 +7,8 @@ use fermium::{
 use glam::UVec2;
 
 pub fn main() {
-    let width = 1920;
-    let height = 1080;
+    let width = 1600;
+    let height = 1000;
     let mut counter = 0;
 
     unsafe {
@@ -40,6 +40,7 @@ pub fn main() {
               }
               _ => (),
             }//match
+            SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
             SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
             SDL_RenderClear(renderer);
 
